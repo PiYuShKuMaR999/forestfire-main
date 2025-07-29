@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forest Fire Prediction System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    :root {
+      --bg: #0b1120;
+      --card: rgba(15, 23, 42, 0.8);
+      --accent: #22d3ee;
+      --accent-alt: #4ade80;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: #1e293b;
+      --hover: #06b6d4;
+      --input: #1e293b;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --safe: #10b981;
+      --glow: 0 0 15px rgba(34, 211, 238, 0.5);
+      --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      min-height: 100vh;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(34, 211, 238, 0.1) 0%, transparent 25%),
+        radial-gradient(circle at 90% 80%, rgba(239, 68, 68, 0.1) 0%, transparent 25%),
+        linear-gradient(to bottom, rgba(15, 23, 42, 0.9), rgba(2, 6, 23, 0.95));
+      background-size: 200% 200%;
+      animation: gradientBG 20s ease infinite;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 0%; }
+      50% { background-position: 100% 100%; }
+      100% { background-position: 0% 0%; }
+    }
+
+    .card {
+      background: var(--card);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border);
+      border-radius: 1.5rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4), 
+                  inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 640px;
+      animation: fadeInUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+      transform-origin: center;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      z-index: 2;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(34, 211, 238, 0.05) 0%,
+        rgba(34, 211, 238, 0) 50%,
+        rgba(239, 68, 68, 0.05) 100%
+      );
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .card::after {
+      content: '';
+      position: absolute;
+      top: -100%;
+      left: -100%;
+      width: 300%;
+      height: 300%;
+      background: linear-gradient(
+        to bottom right,
+        rgba(34, 211, 238, 0.1) 0%,
+        rgba(34, 211, 238, 0) 50%
+      );
+      transform: rotate(30deg);
+      z-index: -1;
+      animation: shine 12s infinite linear;
+      opacity: 0.5;
+    }
+
+    @keyframes shine {
+      0% { transform: rotate(30deg) translate(-10%, -10%); }
+      100% { transform: rotate(30deg) translate(10%, 10%); }
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.5), 
+                 var(--glow),
+                 inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+    }
+
+    h1 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+      text-align: center;
+      background: linear-gradient(to right, #22d3ee, #4ade80);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      position: relative;
+      display: inline-block;
+      width: 100%;
+      letter-spacing: -0.025em;
+      text-shadow: 0 2px 10px rgba(34, 211, 238, 0.3);
+    }
+
+    h1::after {
+      content: '🔥';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.75rem;
+      filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.5));
+    }
+
+    .description {
+      text-align: center;
+      font-size: 1.05rem;
+      color: var(--muted);
+      margin-bottom: 2rem;
+      line-height: 1.7;
+      animation: fadeIn 1s 0.3s both;
+      max-width: 90%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .form-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .input-container {
+      position: relative;
+      transition: var(--transition);
+    }
+
+    .input-container:hover {
+      transform: translateY(-2px);
+    }
+
+    .input {
+      width: 100%;
+      padding: 1rem 1.5rem 1rem 3.5rem;
+      background: var(--input);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 0.75rem;
+      font-size: 1rem;
+      transition: var(--transition);
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3),
+                  0 1px 0 0 rgba(255, 255, 255, 0.03);
+      font-weight: 500;
+    }
+
+    .input::placeholder {
+      color: var(--muted);
+      opacity: 0.7;
+    }
+
+    .input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.3),
+                  inset 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 1.25rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+      transition: var(--transition);
+      font-size: 1.1rem;
+    }
+
+    .input:focus + .input-icon {
+      color: var(--accent);
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .btn {
+      padding: 1.15rem;
+      background: linear-gradient(135deg, var(--accent), var(--hover));
+      color: white;
+      font-weight: 600;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 0.75rem;
+      cursor: pointer;
+      transition: var(--transition);
+      width: 100%;
+      box-shadow: 0 4px 15px rgba(34, 211, 238, 0.3),
+                  0 1px 3px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+      letter-spacing: 0.5px;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, var(--accent-alt), var(--accent));
+      opacity: 0;
+      transition: var(--transition);
+      z-index: -1;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(34, 211, 238, 0.4),
+                  0 3px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn:hover::before {
+      opacity: 1;
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn i {
+      margin-right: 8px;
+    }
+
+    .result-container {
+      margin-top: 2rem;
+      padding: 2rem;
+      border-radius: 0.75rem;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      animation: fadeIn 0.8s ease-out;
+      display: none;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .result-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--safe), var(--warning), var(--danger));
+    }
+
+    .result-title {
+      font-size: 1.1rem;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      font-weight: 600;
+    }
+
+    .result-value {
+      font-size: 1.75rem;
+      font-weight: 800;
+      text-align: center;
+      background: linear-gradient(to right, #22d3ee, #4ade80);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.025em;
+      margin: 0.5rem 0;
+      text-shadow: 0 2px 8px rgba(34, 211, 238, 0.3);
+    }
+
+    .risk-meter {
+      height: 10px;
+      background: linear-gradient(to right, var(--safe), var(--warning), var(--danger));
+      border-radius: 5px;
+      margin: 1.5rem 0;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .risk-meter::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.8) 0%,
+        rgba(255, 255, 255, 0) 50%,
+        rgba(255, 255, 255, 0.8) 100%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 2.5s infinite linear;
+      opacity: 0.5;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .risk-indicator {
+      position: absolute;
+      top: -8px;
+      width: 24px;
+      height: 24px;
+      background: white;
+      border-radius: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 0 0 4px var(--accent),
+                  0 2px 10px rgba(0, 0, 0, 0.2);
+      transition: left 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--bg);
+    }
+
+    .risk-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.75rem;
+      font-weight: 500;
+    }
+
+    .risk-labels span {
+      position: relative;
+      padding-top: 1.5rem;
+    }
+
+    .risk-labels span::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 10px;
+      background: var(--muted);
+      opacity: 0.5;
+    }
+
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: help;
+      margin-left: 0.25rem;
+    }
+
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 240px;
+      background-color: var(--input);
+      color: var(--text);
+      text-align: center;
+      border-radius: 0.75rem;
+      padding: 0.75rem;
+      position: absolute;
+      z-index: 10;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: var(--transition);
+      font-size: 0.9rem;
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      line-height: 1.5;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .tooltip .tooltiptext::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: var(--input) transparent transparent transparent;
+    }
+
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+      transform: translateX(-50%) translateY(-5px);
+    }
+
+    .floating-particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      animation: float linear infinite;
+      filter: blur(1px);
+      opacity: 0.7;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(100vh) rotate(0deg); }
+      100% { transform: translateY(-100vh) rotate(360deg); }
+    }
+
+    .loading {
+      position: relative;
+      color: transparent !important;
+      pointer-events: none;
+    }
+
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 8px;
+      background: var(--muted);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .card {
+        padding: 2rem;
+      }
+      
+      .form-group {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      .result-container {
+        padding: 1.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 1rem;
+      }
+      
+      .card {
+        padding: 1.75rem;
+        border-radius: 1.25rem;
+      }
+      
+      h1 {
+        font-size: 1.8rem;
+      }
+      
+      h1::after {
+        font-size: 1.5rem;
+      }
+      
+      .description {
+        font-size: 0.95rem;
+      }
+      
+      .input {
+        padding: 0.9rem 1.25rem 0.9rem 3rem;
+      }
+      
+      .btn {
+        padding: 1.05rem;
+        font-size: 1rem;
+      }
+
+      .result-value {
+        font-size: 1.5rem;
+      }
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes glow {
+      0% { box-shadow: 0 0 10px rgba(34, 211, 238, 0.5); }
+      50% { box-shadow: 0 0 20px rgba(34, 211, 238, 0.8); }
+      100% { box-shadow: 0 0 10px rgba(34, 211, 238, 0.5); }
+    }
+
+    .pulse {
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    .glow {
+      animation: glow 3s infinite ease-in-out;
+    }
+
+    /* Floating elements */
+    .floating-elements {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .floating-element {
+      position: absolute;
+      opacity: 0.1;
+      filter: blur(40px);
+      border-radius: 50%;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--accent);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--hover);
+    }
+  </style>
+</head>
+<body>
+  <div class="card animate__animated animate__fadeInUp">
+    <h1>Forest Fire Prediction System</h1>
+    <p class="description">
+      Enter environmental parameters to assess forest fire risk probability. 
+      <span class="tooltip">
+        <i class="fas fa-info-circle"></i>
+        <span class="tooltiptext">FFMC, DMC, and ISI are components of the Canadian Forest Fire Weather Index System. Provide accurate measurements for best results.</span>
+      </span>
+    </p>
+
+    <form action="{{ url_for('predict_data') }}" method="post" class="form-group" id="predictionForm">
+      <div class="input-container">
+        <span class="input-icon"><i class="fas fa-temperature-high"></i></span>
+        <input class="input" type="text" name="Temperature" placeholder="Temperature (°C)" required />
+      </div>
+      
+      <div class="input-container">
+        <span class="input-icon"><i class="fas fa-tint"></i></span>
+        <input class="input" type="text" name="RH" placeholder="Relative Humidity (%)" required />
+      </div>
+      
+      <div class="input-container">
+        <span class="input-icon"><i class="fas fa-wind"></i></span>
+        <input class="input" type="text" name="Ws" placeholder="Wind Speed (km/h)" required />
+      </div>
+      
+      <div class="input-container">
+        <span class="input-icon"><i class="fas fa-cloud-rain"></i></span>
+        <input class="input" type="text" name="Rain" placeholder="Rain (mm)" required />
+      </div>
+      
+      <div class="input-container">
+        <span class="input-icon"><i class="fas fa-fire"></i></span>
+        <input class="input" type="text" name="FFMC" placeholder="FFMC" required />
+      </div>
+      
+      <div class="input-container">
+        <span class="input-icon"><i class="fas fa-fire"></i></span>
+        <input class="input" type="text" name="DMC" placeholder="DMC" required />
+      </div>
+      
+      <div class="input-container">
+        <span class="input-icon"><i class="fas fa-fire"></i></span>
+        <input class="input" type="text" name="ISI" placeholder="ISI" required />
+      </div>
+      
+      <div class="input-container">
+        <span class="input-icon"><i class="fas fa-chart-bar"></i></span>
+        <input class="input" type="text" name="Classes" placeholder="Classes (0/1)" required />
+      </div>
+      
+      <div class="input-container">
+        <span class="input-icon"><i class="fas fa-map-marker-alt"></i></span>
+        <input class="input" type="text" name="Region" placeholder="Region ID" required />
+      </div>
+      
+      <button type="submit" class="btn pulse">
+        <i class="fas fa-bolt"></i>
+        <span class="btn-text">Calculate Fire Risk</span>
+      </button>
+    </form>
+
+    <div class="result-container" id="resultContainer">
+      <div class="result-title">
+        <i class="fas fa-chart-line"></i>
+        FIRE WEATHER INDEX PREDICTION
+      </div>
+      <div class="result-value" id="resultValue">{{ results }}</div>
+      <div class="risk-meter">
+        <div class="risk-indicator" id="riskIndicator"></div>
+      </div>
+      <div class="risk-labels">
+        <span>Low</span>
+        <span>Moderate</span>
+        <span>High</span>
+        <span>Extreme</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="floating-particles" id="particles"></div>
+  <div class="floating-elements" id="floatingElements"></div>
+
+  <script>
+    // Create floating particles with improved variety
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = window.innerWidth < 768 ? 20 : 40;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+        
+        // Random size between 2px and 8px
+        const size = Math.random() * 6 + 2;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        
+        // Random position
+        particle.style.left = `${Math.random() * 100}%`;
+        particle.style.top = `${Math.random() * 100}%`;
+        
+        // Random animation duration between 15s and 30s
+        const duration = Math.random() * 15 + 15;
+        particle.style.animationDuration = `${duration}s`;
+        
+        // Random delay
+        particle.style.animationDelay = `${Math.random() * 10}s`;
+        
+        // Random color (blue or green tint)
+        const color = Math.random() > 0.5 ? 'rgba(34, 211, 238, 0.5)' : 'rgba(74, 222, 128, 0.5)';
+        particle.style.background = color;
+        
+        // Random shape (some can be squares)
+        if (Math.random() > 0.8) {
+          particle.style.borderRadius = '2px';
+        }
+        
+        particlesContainer.appendChild(particle);
+      }
+    }
+    
+    // Create floating background elements
+    function createFloatingElements() {
+      const container = document.getElementById('floatingElements');
+      const count = window.innerWidth < 768 ? 3 : 6;
+      
+      for (let i = 0; i < count; i++) {
+        const element = document.createElement('div');
+        element.classList.add('floating-element');
+        
+        // Random size between 100px and 300px
+        const size = Math.random() * 200 + 100;
+        element.style.width = `${size}px`;
+        element.style.height = `${size}px`;
+        
+        // Random position
+        element.style.left = `${Math.random() * 100}%`;
+        element.style.top = `${Math.random() * 100}%`;
+        
+        // Random color
+        const colors = ['rgba(34, 211, 238, 0.3)', 'rgba(239, 68, 68, 0.3)', 'rgba(74, 222, 128, 0.3)'];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        element.style.background = color;
+        
+        // Random animation
+        const duration = Math.random() * 20 + 20;
+        const delay = Math.random() * 10;
+        const xMovement = (Math.random() - 0.5) * 20;
+        const yMovement = (Math.random() - 0.5) * 20;
+        
+        element.style.animation = `floatElement ${duration}s ${delay}s infinite alternate ease-in-out`;
+        element.style.setProperty('--x-move', `${xMovement}vw`);
+        element.style.setProperty('--y-move', `${yMovement}vh`);
+        
+        container.appendChild(element);
+        
+        // Add keyframes dynamically
+        const style = document.createElement('style');
+        style.textContent = `
+          @keyframes floatElement {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(var(--x-move), var(--y-move)); }
+          }
+        `;
+        document.head.appendChild(style);
+      }
+    }
+    
+    // Update risk indicator position based on prediction result
+    function updateRiskIndicator(value) {
+      const resultValue = parseFloat(value) || 0;
+      const indicator = document.getElementById('riskIndicator');
+      const container = document.getElementById('resultContainer');
+      const resultDisplay = document.getElementById('resultValue');
+      
+      // Show result container if there's a value
+      if (resultValue > 0) {
+        container.style.display = 'block';
+        
+        // Calculate position (0-100 scale)
+        let position = Math.min(resultValue, 100);
+        indicator.style.left = `${position}%`;
+        indicator.textContent = `${Math.round(resultValue)}`;
+        
+        // Change color based on risk level
+        if (resultValue < 25) {
+          indicator.style.boxShadow = '0 0 0 4px var(--safe)';
+          container.style.background = 'rgba(16, 185, 129, 0.1)';
+          container.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+          resultDisplay.style.background = 'linear-gradient(to right, #4ade80, #22c55e)';
+        } else if (resultValue < 50) {
+          indicator.style.boxShadow = '0 0 0 4px var(--warning)';
+          container.style.background = 'rgba(245, 158, 11, 0.1)';
+          container.style.borderColor = 'rgba(245, 158, 11, 0.3)';
+          resultDisplay.style.background = 'linear-gradient(to right, #f59e0b, #fbbf24)';
+        } else {
+          indicator.style.boxShadow = '0 0 0 4px var(--danger)';
+          container.style.background = 'rgba(239, 68, 68, 0.1)';
+          container.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+          resultDisplay.style.background = 'linear-gradient(to right, #ef4444, #f87171)';
+        }
+        
+        // Add risk level text
+        let riskLevel = '';
+        if (resultValue < 10) riskLevel = 'Very Low';
+        else if (resultValue < 25) riskLevel = 'Low';
+        else if (resultValue < 50) riskLevel = 'Moderate';
+        else if (resultValue < 75) riskLevel = 'High';
+        else riskLevel = 'Extreme';
+        
+        resultDisplay.textContent = `${resultValue}% (${riskLevel})`;
+      }
+    }
+    
+    // Form submission handling with improved UX
+    document.getElementById('predictionForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const btn = this.querySelector('.btn');
+      const btnText = btn.querySelector('.btn-text');
+      const originalText = btnText.textContent;
+      
+      // Show loading state
+      btnText.textContent = 'Analyzing Data...';
+      btn.classList.add('loading');
+      
+      // Simulate API call delay (remove in production)
+      setTimeout(() => {
+        // In a real app, you would submit the form here
+        // For demo purposes, we'll simulate a response
+        this.submit();
+        
+        // Reset button after submission
+        btn.classList.remove('loading');
+        btnText.textContent = originalText;
+      }, 1500);
+    });
+    
+    // Input validation with visual feedback
+    function setupInputValidation() {
+      const inputs = document.querySelectorAll('.input');
+      
+      inputs.forEach(input => {
+        // Add focus/blur effects
+        input.addEventListener('focus', function() {
+          this.parentElement.style.transform = 'translateY(-3px)';
+          this.style.boxShadow = '0 0 0 3px rgba(34, 211, 238, 0.3)';
+        });
+        
+        input.addEventListener('blur', function() {
+          this.parentElement.style.transform = '';
+          this.style.boxShadow = '';
+        });
+        
+        // Add validation on input
+        input.addEventListener('input', function() {
+          if (this.checkValidity()) {
+            this.style.borderColor = 'var(--accent)';
+            this.parentElement.querySelector('.input-icon').style.color = 'var(--accent)';
+          } else {
+            this.style.borderColor = 'var(--border)';
+            this.parentElement.querySelector('.input-icon').style.color = 'var(--muted)';
+          }
+        });
+      });
+    }
+    
+    // Add parallax effect to card
+    function setupParallaxEffect() {
+      const card = document.querySelector('.card');
+      
+      card.addEventListener('mousemove', (e) => {
+        const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+        const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+        card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+      });
+      
+      // Reset when mouse leaves
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'rotateY(0) rotateX(0)';
+      });
+    }
+    
+    // Initialize when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      createParticles();
+      createFloatingElements();
+      setupInputValidation();
+      setupParallaxEffect();
+      
+      // If there's a result from server, update the UI
+      const resultValue = document.getElementById('resultValue').textContent.trim();
+      if (resultValue) {
+        updateRiskIndicator(resultValue);
+      }
+      
+      // Add click animation to buttons
+      const buttons = document.querySelectorAll('.btn');
+      buttons.forEach(button => {
+        button.addEventListener('click', function() {
+          this.style.transform = 'scale(0.98)';
+          setTimeout(() => {
+            this.style.transform = '';
+          }, 200);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
